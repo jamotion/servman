@@ -1,0 +1,26 @@
+#!/bin/bash
+readonly RED="\e[31m"
+readonly YELLOW="\e[33m"
+readonly GREEN="\e[32m"
+readonly STD="\e[0m"
+
+if [ $# -lt 0 ]
+  then
+    echo -e "${RED}Error! Too few arguments supplied!${STD}"
+    echo -e "${STD}Command: docker-remove-dev <customer> <dbcontainer> <nginxcontainer>"
+    exit 1
+fi
+
+REPOS="base backup data nginx postgresql odoo soffice upgrade"
+for REPO in $REPOS
+  do
+    echo -e "${YELLOW}Updating docker-odoo-${REPO} repository...${STD}"
+    cd /jamoshared/docker-images/docker-odoo-${REPO} && git pull
+    echo -e "${GREEN}Repository updated${STD}"
+    if [ -f /jamoshared/docker-images/docker-odoo-${REPO}/install-scripts ]
+      then
+        echo -e "${YELLOW}-> Installing scripts of docker-odoo-${REPO} repository...${STD}"
+        /jamoshared/docker-images/docker-odoo-${REPO}/install-scripts
+        echo -e "${GREEN}Scripts installed${STD}"
+    fi
+done
