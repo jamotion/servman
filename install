@@ -39,6 +39,5 @@ if [ ! -f /usr/local/bin/docker-enter ]
   then
     echo -e "${YELLOW}Installing docker-enter scripts...${STD}"
     docker run --rm -v /usr/local/bin:/target jpetazzo/nsenter
-    docker rmi -f jpetazzo/nsenter
     echo -e "${GREEN}docker-enter sucessfully installed${STD}"
 fi
