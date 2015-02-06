@@ -22,7 +22,7 @@ if [ $? -ne 0 ]
 fi
 
 echo -e "${YELLOW}Pushing servman repository...${STD}"
-cd /jamoshared/servnam && git push
+cd /jamoshared/servman && git push
 if [ $? -ne 0 ]
   then
     echo -e "${RED}Push failed!${STD}"
