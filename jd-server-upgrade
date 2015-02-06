@@ -1,0 +1,53 @@
+#!/bin/bash
+readonly RED="\e[31m"
+readonly YELLOW="\e[33m"
+readonly GREEN="\e[32m"
+readonly STD="\e[0m"
+
+if [ $# -lt 0 ]
+  then
+    echo -e "${RED}Error! Too few arguments supplied!${STD}"
+    echo -e "${STD}Command: docker-remove-dev <customer> <dbcontainer> <nginxcontainer>"
+    exit 1
+fi
+
+# Install Server Manager Scripts
+if [ -f install-scripts ]
+  then
+    echo -e "${YELLOW}-> Installing scripts of servman repository...${STD}"
+    ./install-scripts > /dev/null
+    if [ $? -ne 0 ]
+      then
+        echo -e "${RED}Script installation failed!${STD}"
+        exit 2
+      else
+        echo -e "${GREEN}Scripts installed${STD}"
+    fi
+fi
+
+REPOS="base backup data nginx postgresql odoo soffice docs upgrade"
+for REPO in $REPOS
+  do
+    echo -e "${YELLOW}Updating docker-odoo-${REPO} repository...${STD}"
+    cd /jamoshared/docker-images/docker-odoo-${REPO} && git pull
+    if [ $? -ne 0 ]
+      then
+        echo -e "${RED}Error while pulling repository!!!${STD}"
+        exit 2
+      else
+        echo -e "${GREEN}Repository updated${STD}"
+    fi
+    if [ -f /jamoshared/docker-images/docker-odoo-${REPO}/install-scripts ]
+      then
+        echo -e "${YELLOW}-> Installing scripts of docker-odoo-${REPO} repository...${STD}"
+        /jamoshared/docker-images/docker-odoo-${REPO}/install-scripts > /dev/null
+        if [ $? -ne 0 ]
+          then
+            echo -e "${RED}Error while installing script!!!${STD}"
+            exit 2
+          else
+            echo -e "${GREEN}Scripts installed${STD}"
+        fi
+
+    fi
+done

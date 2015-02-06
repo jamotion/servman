@@ -1,0 +1,28 @@
+#!/bin/bash
+
+if [ $# -ne 1 ]
+then
+	echo "Wrong number of arguments given!"
+	exit 2
+fi
+
+function stop {
+        echo -e "\n\nStopping container $1..."
+	docker stop -t 30 $1
+	echo -e "Container stopped"
+        exit
+}
+
+trap "stop $1" SIGHUP SIGINT SIGTERM
+
+docker start -a $1 &
+DOCKER_PID=$!
+while true
+do
+	if kill -0 $DOCKER_PID; then
+		sleep 60
+	else
+		echo "Process with ID $DOCKER_PID crashed"
+		exit 1
+	fi
+done

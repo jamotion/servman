@@ -11,6 +11,21 @@ if [ $# -lt 0 ]
     exit 1
 fi
 
+# Install Server Manager Scripts
+if [ -f install-scripts ]
+  then
+    echo -e "${YELLOW}-> Installing scripts of servman repository...${STD}"
+    ./install-scripts > /dev/null
+    if [ $? -ne 0 ]
+      then
+        echo -e "${RED}Script installation failed!${STD}"
+        exit 2
+      else
+        echo -e "${GREEN}Scripts installed${STD}"
+    fi
+fi
+
+# Create main folder for docker images
 if [ ! -d /jamoshared/docker-images ]
   then
     echo -e "${YELLOW}Base directory /jamoshared/docker-images not found, creating it...${STD}"
@@ -18,6 +33,7 @@ if [ ! -d /jamoshared/docker-images ]
     echo -e "${GREEN}Directory created"
 fi
 
+# clone all needed repositories
 REPOS="base backup data nginx postgresql odoo soffice docs upgrade"
 for REPO in $REPOS
   do
@@ -25,19 +41,38 @@ for REPO in $REPOS
       then 
         echo -e "${YELLOW}Cloning docker-odoo-${REPO} repository...${STD}"
         cd /jamoshared/docker-images && git clone https://github.com/jamotion/docker-odoo-${REPO}.git
-        echo -e "${GREEN}Repository sucessfully cloned${STD}"
+        if [ $? -ne 0 ]
+          then
+            echo -e "${RED}Clone of repository failed!${STD}"
+            exit 2
+          else
+            echo -e "${GREEN}Repository sucessfully cloned${STD}"
+        fi
     fi
     if [ -f /jamoshared/docker-images/docker-odoo-${REPO}/install-scripts ]
       then
         echo -e "${YELLOW}-> Installing scripts of docker-odoo-${REPO} repository...${STD}"
-        cd /jamoshared/docker-images/docker-odoo-${REPO} && ./install-scripts
-        echo -e "${GREEN}Scripts installed${STD}"
+        cd /jamoshared/docker-images/docker-odoo-${REPO} && ./install-scripts > /dev/null
+        if [ $? -ne 0 ]
+          then
+            echo -e "${RED}Script installation failed!${STD}"
+            exit 2
+          else
+            echo -e "${GREEN}Scripts installed${STD}"
+        fi
     fi
 done
 
+# Generate docker-enter if not already done
 if [ ! -f /usr/local/bin/docker-enter ]
   then
     echo -e "${YELLOW}Installing docker-enter scripts...${STD}"
     docker run --rm -v /usr/local/bin:/target jpetazzo/nsenter
-    echo -e "${GREEN}docker-enter sucessfully installed${STD}"
+    if [ $? -ne 0 ]
+      then
+        echo -e "${RED}Error while generating docker-enter!${STD}"
+        exit 2
+      else
+        echo -e "${GREEN}docker-enter sucessfully installed${STD}"
+    fi
 fi

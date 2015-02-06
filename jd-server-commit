@@ -1,0 +1,55 @@
+#!/bin/bash
+readonly RED="\e[31m"
+readonly YELLOW="\e[33m"
+readonly GREEN="\e[32m"
+readonly STD="\e[0m"
+
+if [ $# -lt 1 ]
+  then
+    echo -e "${RED}Error! Too few arguments supplied!${STD}"
+    echo -e "${STD}Command: commit <message>"
+    exit 1
+fi
+
+echo -e "${YELLOW}Committing servman repository...${STD}"
+cd /jamoshared/servman && git add --all && git commit -am "$1"
+if [ $? -ne 0 ]
+  then
+    echo -e "${RED}Commit failed!${STD}"
+    exit 2
+  else
+    echo -e "${GREEN}Repository commited${STD}"
+fi
+
+echo -e "${YELLOW}Pushing servman repository...${STD}"
+cd /jamoshared/servnam && git push
+if [ $? -ne 0 ]
+  then
+    echo -e "${RED}Push failed!${STD}"
+    exit 2
+  else
+    echo -e "${GREEN}Repository pushed${STD}"
+fi
+
+REPOS="base backup data nginx postgresql odoo soffice upgrade"
+for REPO in $REPOS
+  do
+    echo -e "${YELLOW}Committing docker-odoo-${REPO} repository...${STD}"
+    cd /jamoshared/docker-images/docker-odoo-${REPO} && git add --all && git commit -am "$1"
+    if [ $? -ne 0 ]
+      then
+        echo -e "${RED}Commit failed!${STD}"
+        exit 2
+      else
+        echo -e "${GREEN}Repository commited${STD}"
+    fi
+    echo -e "${YELLOW}Pushing docker-odoo-${REPO} repository...${STD}"
+    cd /jamoshared/docker-images/docker-odoo-${REPO} && git push
+    if [ $? -ne 0 ]
+      then
+        echo -e "${RED}Push failed!${STD}"
+        exit 2
+      else
+        echo -e "${GREEN}Repository pushed${STD}"
+    fi
+done
