@@ -11,7 +11,7 @@ if [ $# -lt 0 ]
     exit 1
 fi
 
-REPOS="base backup data nginx postgresql odoo soffice upgrade"
+REPOS="base backup data nginx postgresql odoo soffice docs upgrade"
 for REPO in $REPOS
   do
     echo -e "${YELLOW}Updating docker-odoo-${REPO} repository...${STD}"

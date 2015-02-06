@@ -18,7 +18,7 @@ if [ ! -d /jamoshared/docker-images ]
     echo -e "${GREEN}Directory created"
 fi
 
-REPOS="base backup data nginx postgresql odoo soffice upgrade"
+REPOS="base backup data nginx postgresql odoo soffice docs upgrade"
 for REPO in $REPOS
   do
     if [ ! -d /jamoshared/docker-images/docker-odoo-${REPO} ]
